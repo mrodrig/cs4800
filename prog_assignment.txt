@@ -29,7 +29,7 @@ may have another in turn. For example, person A may have a boss B, whose boss is
 C, whose boss is D, whose boss is the CEO. Thus influencing person A will
 automatically influence B, C, D, and the CEO.
 
-Different employes may have bosses in common in the command chain. You DO NOT
+Different employees may have bosses in common in the command chain. You DO NOT
 obtain additional value for influencing a person more than once. For example, if
 A and B both answer directly to the CEO, and you influence both, you will
 receive a value of val(A)+val(B)+val(CEO), not val(A)+val(B)+2val(CEO).
@@ -93,13 +93,29 @@ behavior with faster run time for this data set.
 ===
 SUBMISSION DETAILS
 
-PLEASE READ THIS CAREFULLY. Any submission which does not satisfy these requirements will automatically be deducted 25% off the final grade. If you have any questions at all regarding these, do not hesitate to ask. Their purpose is to ensure speedy grading and to resolve any ambiguities as to what is expected from your submission. 
+PLEASE READ THIS CAREFULLY. Any submission which does not satisfy these
+requirements will automatically be deducted 25% off the final grade. If you have
+any questions at all regarding these, do not hesitate to ask. Their purpose is
+to ensure speedy grading and to resolve any ambiguities as to what is expected
+from your submission.
 
-We've created an assignment on Blackboard called Programming Assignment. Your final submission must be handed in as an attachment for this assignment, before November 24th, 11:59 PM. Your submission should be a single tar.gz bundle whose name is your Husky ID. For example, if your Husky ID is dippel.m, then your submission should be dippel.m.tar.gz. Inside this tar should be a single folder with the name same as the tar bundle. Inside this folder, we expect the following files:
+We've created an assignment on Blackboard called Programming Assignment. Your
+final submission must be handed in as an attachment for this assignment, before
+November 24th, 11:59 PM. Your submission should be a single tar.gz bundle whose
+name is your Husky ID. For example, if your Husky ID is dippel.m, then your
+submission should be dippel.m.tar.gz. Inside this tar should be a single folder
+with the name same as the tar bundle. Inside this folder, we expect the
+following files:
 
 /Source/ - a folder containing the source code for your implementation. 
 
-build.bash - a bash script to build the executable implementation from your /Source/ folder to the current folder, outputting to an extensionless file named sol. If your implementation runs as a non-compiled source, such as Python, then this may be as simple as copying the source to the current folder and naming it sol. It shouldn't be more than one or two lines of code. Below is a sample one liner if you did this project in C++, and your main source file is MyImpl.cpp:
+build.bash - a bash script to build the executable implementation from your
+	/Source/ folder to the current folder, outputting to an extensionless file
+	named sol. If your implementation runs as a non-compiled source, such as
+	Python, then this may be as simple as copying the source to the current
+	folder and naming it sol. It shouldn't be more than one or two lines of
+	code. Below is a sample one liner if you did this project in C++, and your
+	main source file is MyImpl.cpp:
 
 g++ ./Source/MyImpl.cpp -o sol
 
@@ -111,18 +127,30 @@ Readme.pdf - A write up of no more than 4 pages with description and analysis of
 - A proof of correctness of the algorithm
 - A run time analysis of your algorithm, accounting for the insert / query run times of the data structures you used in your implementation
 
-Regarding the code submission, please do not hand in any compiled code. I will always recompile using the build script and run tests with the newly compiled program. You may hand in the sol file if it is a bash script to start your executable. 
+Regarding the code submission, please do not hand in any compiled code. I will
+always recompile using the build script and run tests with the newly compiled
+program. You may hand in the sol file if it is a bash script to start your executable.
 
 ===
 TESTING DETAILS
 
-Your program must take input from STDIN and output its final answer to STDOUT. We have a number of test files which we will pipe into your program, and check the appropriate output. Your final executable, sol, should be able to handle input as follows:
+Your program must take input from STDIN and output its final answer to STDOUT.
+We have a number of test files which we will pipe into your program, and check
+the appropriate output. Your final executable, sol, should be able to handle
+input as follows:
 
 ./sol < inputFile.in > outputFile.out
 
-This will pipe input from inputFile.in into STDIN while running sol. The STDOUT output from sol will be saved to outputFile.out. This allows me to run your code on a number of test files, and compare the output to the expected output. Provided are the script we will use to text your program, runtests.bash, as well as a number of test files. 
+This will pipe input from inputFile.in into STDIN while running sol. The STDOUT
+output from sol will be saved to outputFile.out. This allows me to run your code
+on a number of test files, and compare the output to the expected output.
+Provided are the script we will use to text your program, runtests.bash, as well
+as a number of test files.
 
-We will also provide with you the test script and a collection of test cases to check your program on. If your program takes longer than a minute on a case, that will be considered a failed test. The largest test case will have about 800,000 employees. The test script, runtests.bash, will be called as:
+We will also provide with you the test script and a collection of test cases to
+check your program on. If your program takes longer than a minute on a case,
+that will be considered a failed test. The largest test case will have about
+800,000 employees. The test script, runtests.bash, will be called as:
 ./runtests.bash ./sol
 where sol is the executable that results from building your project.
 
@@ -132,40 +160,68 @@ IMPLEMENTATION HINTS
 ---
 Constant time look up tables
 
-For this assignment, it is likely that you will want to maintain a set of values, with fast insert and query operations. Standard hash tables and Python dictionaries achieve this, but because they need to work for generic data structures, are not the most efficient solution for this problem. Since you are given the minimum and maximum employee ID, which are integers, you can get the same behavior by using a large array. 
+For this assignment, it is likely that you will want to maintain a set of
+values, with fast insert and query operations. Standard hash tables and Python
+dictionaries achieve this, but because they need to work for generic data
+structures, are not the most efficient solution for this problem. Since you are
+given the minimum and maximum employee ID, which are integers, you can get the
+same behavior by using a large array.
 
-For example, in python, if you had employees numbered from 1 to N, you would initialize the array as:
+For example, in python, if you had employees numbered from 1 to N, you would
+initialize the array as:
 set = [False] * (N+1)
 
-Then we can check if an element i has been inserted by checking set[i], insert element i by setting set[i] = True, and delete by setting set[i] = False. This will be faster than if you used a dictionary for the same task, and uses the same syntax.
+Then we can check if an element i has been inserted by checking set[i], insert
+element i by setting set[i] = True, and delete by setting set[i] = False. This
+will be faster than if you used a dictionary for the same task, and uses the
+same syntax.
 
 ---
 Reading and parsing input
 
-Some of the test files are very large, but reading the input should not be the bottleneck on your implementation. In particular, you should not have to read the entire file more than once, and you should not attempt to read in the entire file as one string. All of the data is separated via lines in the input files, so you should parse the file one line at a time. 
+Some of the test files are very large, but reading the input should not be the
+bottleneck on your implementation. In particular, you should not have to read
+the entire file more than once, and you should not attempt to read in the entire
+file as one string. All of the data is separated via lines in the input files,
+so you should parse the file one line at a time.
 
 ---
 Making an executable Python script
 
-If you work in Python, you do not need to hand in compiled Python code. Instead, you can hand in a Python file which is executable in the terminal. First, add the following line to the beginning of your python:
+If you work in Python, you do not need to hand in compiled Python code. Instead,
+you can hand in a Python file which is executable in the terminal. First, add
+the following line to the beginning of your python:
 
 #!/usr/bin/python
 
-Then, navigate to where your file is in the terminal, and add execution privileges to the file:
+Then, navigate to where your file is in the terminal, and add execution
+privileges to the file:
 
 chmod +x mySolution.py
 
-Now, you can call ./mySolution.py in the terminal without explicitly calling Python in the command.
+Now, you can call ./mySolution.py in the terminal without explicitly calling
+Python in the command.
 
 ---
 Making a sol file for Java projects
 
-If you work in Java, you will need to call your main class to run in the JVM. In order to have a sol file which can be called via command line, I recommend you do the following:
+If you work in Java, you will need to call your main class to run in the JVM.
+In order to have a sol file which can be called via command line, I recommend
+you do the following:
 
-i) Your build script should compile your source code into class files, which can remain in the Source directory
-ii) Your sol file can be a bash script which starts the JVM with the main class file in the source directory. 
+i) Your build script should compile your source code into class files, which can
+remain in the Source directory
+ii) Your sol file can be a bash script which starts the JVM with the main class
+file in the source directory.
 
 ---
 Working on a Windows machine
 
-If you do not have access to a Linux machine outside of WVH, it is still possible to work on this project and test without coming into WVH. First, with the exception of various C/C++ compilers, a project which builds and works correctly on Windows without the use of operating system calls, which you do not need for this assignment, should still work on other machines. In the end, if you do not have a Linux machine, and do not know how to SSH into CCS machines (and don't want to learn how), you should come into WVH at least once before submission to confirm that your project builds and runs on these machines. 
+If you do not have access to a Linux machine outside of WVH, it is still
+possible to work on this project and test without coming into WVH. First, with
+the exception of various C/C++ compilers, a project which builds and works
+correctly on Windows without the use of operating system calls, which you do not
+need for this assignment, should still work on other machines. In the end, if
+you do not have a Linux machine, and do not know how to SSH into CCS machines
+(and don't want to learn how), you should come into WVH at least once before
+submission to confirm that your project builds and runs on these machines.

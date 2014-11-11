@@ -1,2 +1,4 @@
 echo "Building the solution..."
-# TODO
+cp ./Source/influence.py ./sol
+chmod +x ./sol
+echo "Build finished."
