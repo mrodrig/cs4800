@@ -109,40 +109,48 @@ def main():
 		influenced[0] = False # Cannot influence a non-existent employee
 		print calculateInfluenceTotal()
 
+	print "starting"
+	for i in range(1, num_to_influence):
+		print i
+		for j in range(1, (num_employees+1)/2):
+			""
+	print "ending"
+
 	# Find all employees that are at the lowest level (have no subordinates)
-	lowestLevelWorkerIds = []
-	maxEffect = -1
-	maxId     = -1
-	for i in range(1, num_employees+1):
-		if (subordinates[i] == []):
-			effect = employeeInfluenceEffect(i)
-			if effect > maxEffect:
-				maxEffect = effect
-				maxId = i
-			lowestLevelWorkerIds.append((i, effect))
+#	lowestLevelWorkerIds = []
+#	maxEffect = -1
+#	maxId     = -1
+#	for i in range(1, num_employees+1):
+#		if (subordinates[i] == []):
+#			effect = employeeInfluenceEffect(i)
+#			if effect > maxEffect:
+#				maxEffect = effect
+#				maxId = i
+#			lowestLevelWorkerIds.append((i, effect))
 
-	if (len(lowestLevelWorkerIds) == 0):
-		print "There is an error with the data - hierarchy is circular"
-	else:
-		influence(maxId) # Influence the employee with the max value
-		lowestLevelWorkerIds.remove((maxId, maxEffect))
-		for i in range(1, num_to_influence):
-			maxEffect = -1
-			maxId     = -1
-			for i in range(len(lowestLevelWorkerIds)):
-				(empId, effect) = lowestLevelWorkerIds[i]
-				effect = employeeInfluenceEffect(empId)
-				lowestLevelWorkerIds[i] = (empId, effect)
-				if effect > maxEffect:
-					maxEffect = effect
-					maxId = empId
-			influence(maxId)
-			try:
-				lowestLevelWorkerIds.remove((maxId, maxEffect))
-			except ValueError:
-				print "ERROR", lowestLevelWorkerIds, (maxId, maxEffect)
+#	print len(lowestLevelWorkerIds), num_employees
+#	if (len(lowestLevelWorkerIds) == 0):
+#		print "There is an error with the data - hierarchy is circular"
+#	else:
+#		influence(maxId) # Influence the employee with the max value
+#		lowestLevelWorkerIds.remove((maxId, maxEffect))
+#		for i in range(1, num_to_influence):
+#			maxEffect = -1
+#			maxId     = -1
+#			for i in range(len(lowestLevelWorkerIds)):
+#				(empId, effect) = lowestLevelWorkerIds[i]
+#				effect = employeeInfluenceEffect(empId)
+#				lowestLevelWorkerIds[i] = (empId, effect)
+#				if effect > maxEffect:
+#					maxEffect = effect
+#					maxId = empId
+#			influence(maxId)
+#			try:
+#				lowestLevelWorkerIds.remove((maxId, maxEffect))
+#			except ValueError:
+#				print "ERROR", lowestLevelWorkerIds, (maxId, maxEffect)
 
-	print calculateInfluenceTotal()
+#	print calculateInfluenceTotal()
 
 	# DYNAMIC PROGRAMMING ATTEMPT:
 	# Find optimal solutions
