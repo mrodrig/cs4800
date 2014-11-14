@@ -14,8 +14,10 @@ subordinates = [[]]
 effects = [0]
 # Set of Ids of employees we have influenced
 influenced = []
-# Array of values for the optimal solution. Opt[num_employees+1] is optimal
-opt_values = []
+# Values of employees as others are chosen
+residualEffect = []
+# List of tuples of scanned employees
+scannedEmployees = []
 
 
 # Prints the correct script usage and exits
@@ -66,20 +68,42 @@ def employeeInfluenceEffect(empId):
 		empId = bossIds[empId]
 	return acc
 
-def findOpt(i, j): # the optimal solution for employees 1...i with up to j influences
-	global opt_values
+# id: current employee id, value: boss' value, maxVal: maximum value seen so far
+def scanTree(id, value, maxVal):
+	# If another employee has already been seen with higher influence overall
+	if (maxVal > (value + values[id])):
+		effects[id] = values[id]
+	else: # This is the highest employee seen so far
+		effects[id] = value + values[id]
 
-	# Base Cases
-	if j == 0: return 0
-	if i <= 0: opt_values[i][j] = 0
-	if i == 1: opt_values[i][j] = values[i]
+	# List of subordinates
+	subList = subordinates[id]
 
-	excluding = opt_values[i-1][j]
-	including = values[i] + opt_values[bossIds[i]][j]
-	opt_values[i][j] = max(excluding, including)
+	# If no subordinates (BASE CASE)
+	if len(subList) == 0:
+		return (id, effects[id], effects[id], 0)
+
+	maxId = 0
+	maxEffect = effects[id]
+	for indx in range(len(subList)):
+		subordinate = subList[indx]
+		(subId, subEffect, subMax, subMaxId) = scanTree(subordinate, effects[id], maxEffect)
+		if (subEffect > maxEffect):
+			maxEffect = subEffect
+			maxId = subId
+			# recur on previous subordinates with new max
+			#print id, indx, subList[0:0 if indx == 0 else indx], subId
+			for prevSub in subList[0:0 if indx == 0 else indx]:
+				(prevSubId, prevSubEffect, prevMax, prevId) = scanTree(prevSub, effects[id], maxEffect)
+				#print residualEffect[prevSubId], prevSubEffect
+				residualEffect[prevSubId] = prevSubEffect
+		residualEffect[subId] = subEffect
+	if maxEffect > effects[id]: # if choosing a subordinate is better, this node's residual value becomes 0
+		residualEffect[id] = 0
+	return (id, residualEffect[id], maxEffect, maxId)
 
 def main():
-	global influenced, opt_values
+	global influenced, residualEffect
 	argv = sys.stdin.readline().strip().split(" ")
 	argc = len(argv)
 	if (not(argc == 2)):
@@ -91,8 +115,7 @@ def main():
 
 	# Intialize the influenced array to all False
 	influenced = [False] * (num_employees+1)
-	# The following line is causing the program to run extremely slow on large inputs:
-	#opt_values = [[0 for x in range(num_to_influence + 1)] for x in range(num_employees + 1)]
+	residualEffect = [0] * (num_employees+1)
 
 	# Fetch each employee's information
 	for i in range(num_employees):
@@ -109,57 +132,12 @@ def main():
 		influenced[0] = False # Cannot influence a non-existent employee
 		print calculateInfluenceTotal()
 
-	print "starting"
-	for i in range(1, num_to_influence):
-		print i
-		for j in range(1, (num_employees+1)/2):
-			""
-	print "ending"
-
-	# Find all employees that are at the lowest level (have no subordinates)
-#	lowestLevelWorkerIds = []
-#	maxEffect = -1
-#	maxId     = -1
-#	for i in range(1, num_employees+1):
-#		if (subordinates[i] == []):
-#			effect = employeeInfluenceEffect(i)
-#			if effect > maxEffect:
-#				maxEffect = effect
-#				maxId = i
-#			lowestLevelWorkerIds.append((i, effect))
-
-#	print len(lowestLevelWorkerIds), num_employees
-#	if (len(lowestLevelWorkerIds) == 0):
-#		print "There is an error with the data - hierarchy is circular"
-#	else:
-#		influence(maxId) # Influence the employee with the max value
-#		lowestLevelWorkerIds.remove((maxId, maxEffect))
-#		for i in range(1, num_to_influence):
-#			maxEffect = -1
-#			maxId     = -1
-#			for i in range(len(lowestLevelWorkerIds)):
-#				(empId, effect) = lowestLevelWorkerIds[i]
-#				effect = employeeInfluenceEffect(empId)
-#				lowestLevelWorkerIds[i] = (empId, effect)
-#				if effect > maxEffect:
-#					maxEffect = effect
-#					maxId = empId
-#			influence(maxId)
-#			try:
-#				lowestLevelWorkerIds.remove((maxId, maxEffect))
-#			except ValueError:
-#				print "ERROR", lowestLevelWorkerIds, (maxId, maxEffect)
-
-#	print calculateInfluenceTotal()
-
-	# DYNAMIC PROGRAMMING ATTEMPT:
-	# Find optimal solutions
-	#for i in range(0, num_employees+1):
-	#	opt_values.append([0] * (num_to_influence + 1))
-	#	for j in range(1, num_to_influence+1):
-	#		#findOpt(i, j)
-	#		print "i: %d\t j: %d" % (i, j)
-
-	#print opt_values[num_employees][num_to_influence]
+	print "scanning"
+	scanTree(1, 0, 0)
+	print "sorting"
+	for i in range(len(residualEffect)):
+		scannedEmployees.append((i, residualEffect[i]))
+	scannedEmployees.sort(key=lambda tup: tup[1], reverse=True) # Decreasing order
+	print scannedEmployees
 
 main()
