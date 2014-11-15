@@ -18,6 +18,8 @@ influenced = []
 residualEffect = []
 # List of tuples of scanned employees
 scannedEmployees = []
+# Is this employee a max of a branch?
+isMax = []
 
 
 # Prints the correct script usage and exits
@@ -69,41 +71,35 @@ def employeeInfluenceEffect(empId):
 	return acc
 
 # id: current employee id, value: boss' value, maxVal: maximum value seen so far
-def scanTree(id, value, maxVal):
-	# If another employee has already been seen with higher influence overall
-	if (maxVal > (value + values[id])):
-		effects[id] = values[id]
-	else: # This is the highest employee seen so far
-		effects[id] = value + values[id]
+def scanTree(id, value, max):
+	if id == 15:
+		print value, max
+	if (not isMax[id]):
+		residualEffect[id] = value + values[id]
 
 	# List of subordinates
 	subList = subordinates[id]
 
 	# If no subordinates (BASE CASE)
 	if len(subList) == 0:
-		return (id, effects[id], effects[id], 0)
+		return (id, residualEffect[id], residualEffect[id])
 
-	maxId = 0
-	maxEffect = effects[id]
-	for indx in range(len(subList)):
-		subordinate = subList[indx]
-		(subId, subEffect, subMax, subMaxId) = scanTree(subordinate, effects[id], maxEffect)
-		if (subEffect > maxEffect):
-			maxEffect = subEffect
-			maxId = subId
-			# recur on previous subordinates with new max
-			#print id, indx, subList[0:0 if indx == 0 else indx], subId
-			for prevSub in subList[0:0 if indx == 0 else indx]:
-				(prevSubId, prevSubEffect, prevMax, prevId) = scanTree(prevSub, effects[id], maxEffect)
-				#print residualEffect[prevSubId], prevSubEffect
-				residualEffect[prevSubId] = prevSubEffect
-		residualEffect[subId] = subEffect
-	if maxEffect > effects[id]: # if choosing a subordinate is better, this node's residual value becomes 0
-		residualEffect[id] = 0
-	return (id, residualEffect[id], maxEffect, maxId)
+	branchMax = residualEffect[id]
+	branchMaxId = id
+	for subordinate in subList:
+		(subId, subEffect, subBranchMax) = scanTree(subordinate, 0 if influenced[id] else effects[id], branchMax)
+		if subBranchMax > branchMax:
+			branchMax = subBranchMax
+			branchMaxId = subId
+	isMax[branchMaxId] = True
+	for subordinate in subList: # Update non chosen employees, starting with 0 for value
+		(subId, subEffect, subBranchMax) = scanTree(subordinate, 0, branchMax)
+	residualEffect[id] = 0 # no point influencing a non leaf
+	influenced[id] = True
+	return (id, residualEffect[id], branchMax)
 
 def main():
-	global influenced, residualEffect
+	global influenced, residualEffect, isMax
 	argv = sys.stdin.readline().strip().split(" ")
 	argc = len(argv)
 	if (not(argc == 2)):
@@ -115,6 +111,7 @@ def main():
 
 	# Intialize the influenced array to all False
 	influenced = [False] * (num_employees+1)
+	isMax = [False] * (num_employees+1)
 	residualEffect = [0] * (num_employees+1)
 
 	# Fetch each employee's information
@@ -132,12 +129,15 @@ def main():
 		influenced[0] = False # Cannot influence a non-existent employee
 		print calculateInfluenceTotal()
 
-	print "scanning"
 	scanTree(1, 0, 0)
-	print "sorting"
 	for i in range(len(residualEffect)):
+		# Add (id, effect) tuples to scannedEmployees list
 		scannedEmployees.append((i, residualEffect[i]))
 	scannedEmployees.sort(key=lambda tup: tup[1], reverse=True) # Decreasing order
 	print scannedEmployees
+	result = 0
+	for i in range(num_to_influence):
+		result += scannedEmployees[i][1] # Add the result
+	print result
 
 main()
