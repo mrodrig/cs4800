@@ -40,13 +40,9 @@ def reset(id):
 	for sub in subordinates[id]:
 		reset(sub)
 
-# id: current employee id, value: boss' value, maxVal: maximum value seen so far
-def scanTree(id, value, max):
-	print (id, value, max)
-	if (value + values[id] > max):
-		residualEffect[id] = value + values[id]
-	else:
-		residualEffect[id] = values[id]
+# id: current employee id, value: boss' value
+def fixTree(id, value):
+	residualEffect[id] = value + values[id]
 
 	# List of subordinates
 	subList = subordinates[id]
@@ -57,18 +53,41 @@ def scanTree(id, value, max):
 
 	branchMax = residualEffect[id]
 	branchMaxId = id
-	print [effects[id], residualEffect[id]]
 	for subordinate in subList:
-		(subId, subEffect, subBranchMax) = scanTree(subordinate, 0 if influenced[id] else effects[id], branchMax)
+		(subId, subEffect, subBranchMax) = fixTree(subordinate, residualEffect[id])
 		if subBranchMax > branchMax:
 			branchMax = subBranchMax
 			branchMaxId = subId
-	branchMaxIndex = subList.index(branchMaxId) if branchMaxId in subList else 0
 
 	residualEffect[id] = 0 # no point influencing a non leaf
-	for subordinate in subList[0:branchMaxIndex]: # Update non max influence employees, starting with 0 for value
-		print str(id) + " fixing sub via " + str((subordinate, residualEffect[id], branchMax))
-		(subId, subEffect, subBranchMax) = scanTree(subordinate, residualEffect[id], branchMax)
+	for subordinate in subList: # Update non max influence employees, starting with 0 for value
+		if subordinate == branchMaxId: continue # skip this branch
+		(subId, subEffect, subBranchMax) = fixTree(subordinate, residualEffect[id])
+	return (id, residualEffect[id], branchMax)
+
+# id: current employee id, value: boss' value
+def scanTree(id, value):
+	residualEffect[id] = effects[id]
+
+	# List of subordinates
+	subList = subordinates[id]
+
+	# If no subordinates (BASE CASE)
+	if len(subList) == 0:
+		return (id, residualEffect[id], residualEffect[id])
+
+	branchMax = residualEffect[id]
+	branchMaxId = id
+	for subordinate in subList:
+		(subId, subEffect, subBranchMax) = scanTree(subordinate, residualEffect[id])
+		if subBranchMax > branchMax:
+			branchMax = subBranchMax
+			branchMaxId = subId
+
+	residualEffect[id] = 0 # no point influencing a non leaf
+	for subordinate in subList: # Update non max influence employees, starting with 0 for value
+		if subordinate == branchMaxId: continue # skip this branch
+		(subId, subEffect, subBranchMax) = fixTree(subordinate, residualEffect[id])
 	return (id, residualEffect[id], branchMax)
 
 def main():
@@ -101,12 +120,13 @@ def main():
 		influenced[0] = False # Cannot influence a non-existent employee
 		print calculateInfluenceTotal()
 
-	scanTree(1, 0, 0)
+	#print effects
+	scanTree(1, 0)
 	for i in range(len(residualEffect)):
 		# Add (id, effect) tuples to scannedEmployees list
 		scannedEmployees.append((i, residualEffect[i]))
 	scannedEmployees.sort(key=lambda tup: tup[1], reverse=True) # Decreasing order
-	print scannedEmployees
+	#print scannedEmployees
 	result = 0
 	for (id, effect) in scannedEmployees[0:num_to_influence]:
 		result += effect # Add the result
