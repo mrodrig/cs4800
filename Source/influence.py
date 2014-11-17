@@ -12,8 +12,6 @@ values = [0]
 subordinates = [[]]
 # Set max influence effect for each employee
 effects = [0]
-# Set of Ids of employees we have influenced
-influenced = []
 # Values of employees as others are chosen
 residualEffect = []
 # List of tuples of scanned employees
@@ -33,12 +31,6 @@ def addEmployee(empId, bossId, value):
 	values.append(value)
 	effects.append(effects[bossId] + value)
 	bossIds.append(bossId)
-
-# Resets the influenced value to False for employee with id = id and all subordinates
-def reset(id):
-	influenced[id] = False
-	for sub in subordinates[id]:
-		reset(sub)
 
 # id: current employee id, value: boss' value
 def fixTree(id, value):
@@ -91,7 +83,7 @@ def scanTree(id, value):
 	return (id, residualEffect[id], branchMax)
 
 def main():
-	global influenced, residualEffect
+	global residualEffect
 	argv = sys.stdin.readline().strip().split(" ")
 	argc = len(argv)
 	if (not(argc == 2)):
@@ -101,8 +93,7 @@ def main():
 	num_employees = int(argv[argc-2])
 	num_to_influence = int(argv[argc-1])
 
-	# Intialize the influenced array to all False
-	influenced = [False] * (num_employees+1)
+	# Intialize the residualEffect for all employees to 0
 	residualEffect = [0] * (num_employees+1)
 
 	# Fetch each employee's information
@@ -111,25 +102,8 @@ def main():
 		vals = line.split(" ")
 		addEmployee(int(vals[0]), int(vals[1]), int(vals[2]))
 
-	# If we cannot influence anyone, then value is 0
-	if (num_to_influence == 0):
-		print 0
-	# If we have less employees than we are allowed to influence, then return sum of all values
-	elif (num_employees < num_to_influence):
-		influenced = [True] * (num_employees+1)
-		influenced[0] = False # Cannot influence a non-existent employee
-		print calculateInfluenceTotal()
-
-	#print effects
 	scanTree(1, 0)
-	for i in range(len(residualEffect)):
-		# Add (id, effect) tuples to scannedEmployees list
-		scannedEmployees.append((i, residualEffect[i]))
-	scannedEmployees.sort(key=lambda tup: tup[1], reverse=True) # Decreasing order
-	#print scannedEmployees
-	result = 0
-	for (id, effect) in scannedEmployees[0:num_to_influence]:
-		result += effect # Add the result
-	print result
+	residualEffect.sort(reverse=True) # Decreasing order
+	print sum(residualEffect[0:num_to_influence])
 
 main()
