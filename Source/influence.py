@@ -10,10 +10,8 @@ bossIds = [0]
 values = [0]
 # Array of arrays where subordinates[1] is the list of subordinates
 subordinates = [[]]
-# Set max influence effect for each employee
-effects = [0]
 # Values of employees as others are chosen
-residualEffect = []
+residualEffect = [0]
 # List of tuples of scanned employees
 scannedEmployees = []
 
@@ -29,7 +27,7 @@ def addEmployee(empId, bossId, value):
 	subordinates.append([]) # Add this employee to the subordinates list
 	subordinates[bossId].append(empId) # Add this employee ID as subordinate to his/her boss
 	values.append(value)
-	effects.append(effects[bossId] + value)
+	residualEffect.append(residualEffect[bossId] + value)
 	bossIds.append(bossId)
 
 # id: current employee id, value: boss' value
@@ -59,7 +57,6 @@ def fixTree(id, value):
 
 # id: current employee id, value: boss' value
 def scanTree(id, value):
-	residualEffect[id] = effects[id]
 
 	# List of subordinates
 	subList = subordinates[id]
@@ -83,7 +80,6 @@ def scanTree(id, value):
 	return (id, residualEffect[id], branchMax)
 
 def main():
-	global residualEffect
 	argv = sys.stdin.readline().strip().split(" ")
 	argc = len(argv)
 	if (not(argc == 2)):
@@ -92,9 +88,6 @@ def main():
 	# Retrieve the params from line 1
 	num_employees = int(argv[argc-2])
 	num_to_influence = int(argv[argc-1])
-
-	# Intialize the residualEffect for all employees to 0
-	residualEffect = [0] * (num_employees+1)
 
 	# Fetch each employee's information
 	for i in range(num_employees):
