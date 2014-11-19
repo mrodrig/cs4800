@@ -2,6 +2,7 @@
 # Michael Rodrigues (rodrigues.mi@husky.neu.edu)
 # CS4800 Fall 2014 Programming Assignment
 
+# Import the sys library to be able to read lines from stdin
 import sys
 
 # Array where bossIds[0] = 0, bossIds[1] = 0 (CEO's boss), bossIds[<i>] = i's boss' id
