@@ -36,7 +36,10 @@ def addEmployee(empId, bossId, value):
 	# Add this employee's boss' id
 	bossIds.append(bossId)
 
-# id: current employee id, value: boss' value
+# This function walks down the tree and updates the residual value of employees
+# such that the non-maximum employees
+# id: current employee id
+# value: boss' value
 def fixTree(id, value):
 	# Update this employee's residual value to ignore his/her boss' values
 	residualEffect[id] = value + values[id]
