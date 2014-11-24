@@ -1,2 +1,5 @@
-cp ./Source/influence.py ./sol
-chmod +x ./sol
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+rm "${DIR}/sol"
+CLASSDIR="${DIR}/Source/"
+cp "${CLASSDIR}influence.py" "${DIR}/sol"
+chmod +x "${DIR}/sol"
