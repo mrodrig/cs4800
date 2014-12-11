@@ -2,6 +2,10 @@ CS4800 Fall 2014
 ======
 Programming Assignment: Optimal Influence in a Hierarchy
 ------
+## Grade
+#### My Grade: 92/100
+#### Course Average: 76.44/100
+#### Course Median: 87/100
 
 ## Problem Description
 The following is an excerpt of the problem description provided by the course staff:
