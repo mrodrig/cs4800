@@ -41,7 +41,8 @@ employee will have id 1, and boss id 0, indicating that it is the CEO.
 
 ## Input/Output
 The following is an excerpt of the problem description provided by the course staff:
-###Input Format:
+
+### Input Format:
 >Line 1: n k
 
 >n is the number of employees to follow, k is the number of employees you are expected to influence
@@ -54,7 +55,7 @@ The following is an excerpt of the problem description provided by the course st
 
 >k is the value of influencing the employee (always non-negative)
 
-###Output Format:
+### Output Format:
 >Line 1: VALUE
 >Where VALUE is the max possible total utility from a selection of k employees.
 
